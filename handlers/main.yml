@@ -1,0 +1,4 @@
+
+- name: uci commit
+  raw: uci commit
+  become: yes

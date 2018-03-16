@@ -1,0 +1,32 @@
+
+- name: get https installed
+  raw: opkg list-installed | grep luci-ssl
+  become: yes
+  changed_when: false
+  failed_when: false
+  register: https_installed
+
+- name: enable https
+  raw: opkg install luci-ssl
+  become: yes
+  when: not https_installed
+
+- name: confirm https enabled
+  wait_for:
+    host: 192.168.1.1
+    port: 443
+    timeout: 3
+  delegate_to: localhost
+
+- name: get http setting
+  raw: uci get uhttpd.main.listen_http
+  become: yes
+  changed_when: false
+  failed_when: false
+  register: http_status
+
+- name: disable http
+  raw: uci delete uhttpd.main.listen_http
+  notify: uci commit
+  become: yes
+  when: not "Entry not found" in http_status.stdout

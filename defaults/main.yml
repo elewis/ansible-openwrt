@@ -1,0 +1,4 @@
+
+# Control listening options for uhttpd (admin UI)
+openwrt_listen_http: false
+openwrt_listen_https: true
