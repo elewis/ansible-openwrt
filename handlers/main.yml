@@ -2,3 +2,7 @@
 - name: uci commit
   raw: uci commit
   become: yes
+
+- name: restart uhttpd
+  raw: /etc/init.d/uhttpd restart
+  become: yes

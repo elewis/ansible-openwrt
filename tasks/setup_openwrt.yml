@@ -1,32 +1,46 @@
 
-- name: get https installed
+- name: Get https enabled
   raw: opkg list-installed | grep luci-ssl
   become: yes
   changed_when: false
   failed_when: false
-  register: https_installed
+  register: is_https_enabled
 
-- name: enable https
+- name: Enable https
   raw: opkg install luci-ssl
   become: yes
-  when: not https_installed
+  when: not is_https_enabled
 
-- name: confirm https enabled
+- meta: flush_handlers
+
+- name: Confirm https enabled
   wait_for:
-    host: 192.168.1.1
+    host: "{{ ansible_ipv4_addr | default(inventory_hostname) }}"
     port: 443
     timeout: 3
   delegate_to: localhost
 
-- name: get http setting
+- name: Get http setting
   raw: uci get uhttpd.main.listen_http
   become: yes
   changed_when: false
   failed_when: false
-  register: http_status
+  register: is_http_enabled
 
-- name: disable http
+- name: Disable http
   raw: uci delete uhttpd.main.listen_http
-  notify: uci commit
+  notify:
+    - uci commit
+    - restart uhttpd
   become: yes
-  when: not "Entry not found" in http_status.stdout
+  when: not "Entry not found" in is_http_enabled.stdout
+
+- meta: flush_handlers
+
+- name: Confirm http disabled
+  wait_for:
+    host: "{{ ansible_ipv4_addr | default(inventory_hostname) }}"
+    port: 80
+    state: stopped
+    timeout: 3
+  delegate_to: localhost
