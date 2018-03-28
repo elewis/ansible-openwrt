@@ -1,0 +1,29 @@
+
+- name: Refresh opkg
+  raw: opkg update
+  changed_when: false
+  become: yes
+
+- name: Install packages for opkg https sources
+  raw: opkg install {{ item }}
+  with_items:
+    - wget
+    - ca-certificates
+  changed_when: '"Installing" in package_installed.stdout'
+  register: package_installed
+  become: yes
+
+- name: Rewrite opkg sources list
+  raw: sed -i.bak 's|http:|https:|g' /etc/opkg/distfeeds.conf
+  changed_when: false
+  become: yes
+
+- name: Check if opkg sources list changed
+  raw: cmp -s /etc/opkg/distfeeds.conf /etc/opkg/distfeeds.conf.bak
+  changed_when: opkg_sources_changed.rc != 0
+  failed_when: false
+  register: opkg_sources_changed
+  notify: opkg update
+  become: yes
+
+- meta: flush_handlers

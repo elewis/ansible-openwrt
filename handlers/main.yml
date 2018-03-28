@@ -6,3 +6,7 @@
 - name: restart uhttpd
   raw: /etc/init.d/uhttpd restart
   become: yes
+
+- name: opkg update
+  raw: opkg update
+  become: yes
