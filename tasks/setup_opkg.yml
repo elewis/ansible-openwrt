@@ -14,7 +14,7 @@
   become: yes
 
 - name: Rewrite opkg sources list
-  raw: sed -i.bak 's|http:|https:|g' /etc/opkg/distfeeds.conf
+  raw: sed -i.bak 's/http:/https:/g' /etc/opkg/distfeeds.conf
   changed_when: false
   become: yes
 

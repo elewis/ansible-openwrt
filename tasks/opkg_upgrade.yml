@@ -1,0 +1,11 @@
+
+- name: List all upgradable packages
+  raw: opkg list-upgradable | awk '{ print $1 }'
+  changed_when: false
+  register: upgradable_packages
+  become: yes
+
+- name: Upgrade all upgradable packages
+  raw: opkg upgrade {{ item }}
+  with_items: "{{ upgradable_packages.stdout_lines | map('trim') | reject('equalto', '') | list }}"
+  become: yes
