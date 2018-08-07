@@ -8,8 +8,11 @@
 
 - name: Enable https
   raw: opkg install luci-ssl
+  notify:
+    - uci commit
+    - restart uhttpd
   become: yes
-  when: not is_https_enabled
+  when: is_https_enabled.rc != 0
 
 - meta: flush_handlers
 

@@ -1,4 +1,4 @@
 
 - import_tasks: setup_opkg.yml
-- import_tasks: setup_uhttpd.yml
 - import_tasks: opkg_upgrade.yml
+- import_tasks: setup_uhttpd.yml
